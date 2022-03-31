@@ -1,84 +1,81 @@
 {
-  "name": "react-lrud",
-  "version": "1.6.0",
-  "description": "Official React bindings for Lrud",
-  "main": "dist/index.js",
-  "unpkg": "dist/index.js",
-  "license": "Apache-2.0",
-  "files": [
-    "dist"
-  ],
-  "author": {
-    "name": "Stuart Williams",
-    "url": "https://github.com/stuart-williams"
-  },
-  "keywords": [
-    "tv",
-    "navigation",
-    "tv-apps",
-    "react",
-    "react-tv",
-    "focus",
-    "focus management",
-    "spatial navigation",
-    "smart tv"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "git@github.com:bbc/react-lrud.git"
-  },
-  "peerDependencies": {
-    "react": "^16.2.0",
-    "lrud": "^2.7.1"
-  },
-  "devDependencies": {
-    "@babel/cli": "^7.2.3",
-    "@babel/core": "^7.3.4",
-    "@babel/preset-env": "^7.3.4",
-    "@babel/preset-react": "^7.0.0",
-    "enzyme": "^3.3.0",
-    "enzyme-adapter-react-16": "^1.1.1",
-    "eslint": "^4.18.1",
-    "eslint-config-standard": "^11.0.0",
-    "eslint-config-standard-react": "^6.0.0",
-    "eslint-plugin-import": "^2.9.0",
-    "eslint-plugin-node": "^6.0.1",
-    "eslint-plugin-promise": "^3.6.0",
-    "eslint-plugin-react": "^7.7.0",
-    "eslint-plugin-standard": "^3.0.1",
-    "in-publish": "^2.0.0",
-    "jest": "^24.1.0",
-    "pre-push": "^0.1.1"
-  },
-  "dependencies": {
-    "airbnb-prop-types": "^2.8.1",
-    "hoist-non-react-statics": "^2.5.0",
-    "lrud": "^2.7.0",
-    "prop-types": "^15.6.1",
-    "uniqid": "^4.1.1",
-    "react": "^16.2.0",
-    "react-dom": "^16.2.0",
-    "rimraf": "^2.6.2"
-  },
-  "pre-push": [
-    "lint",
-    "test"
-  ],
-  "scripts": {
-    "clean": "rimraf dist",
-    "lint": "eslint src test",
-    "prebuild": "npm run clean",
-    "build": "babel src --out-dir dist",
-    "prepublish": "not-in-install && npm run build || in-install # NPM insanely runs prepublish on npm install: https://github.com/npm/npm/issues/3059",
-    "pretest": "npm run lint",
-    "test": "jest",
-    "preversion": "npm test",
-    "postversion": "git push && git push --tags",
-    "watch": "npm run build -- --watch"
-  },
-  "jest": {
-    "setupFiles": [
-      "./test/setup"
-    ]
-  }
+    "name": "react-lrud",
+    "version": "1.6.0",
+    "description": "Official React bindings for Lrud",
+    "main": "dist/index.js",
+    "unpkg": "dist/index.js",
+    "license": "Apache-2.0",
+    "files": [
+        "dist"
+    ],
+    "author": {
+        "name": "Stuart Williams",
+        "url": "https://github.com/stuart-williams"
+    },
+    "keywords": [
+        "tv",
+        "navigation",
+        "tv-apps",
+        "react",
+        "react-tv",
+        "focus",
+        "focus management",
+        "spatial navigation",
+        "smart tv"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "git@github.com:bbc/react-lrud.git"
+    },
+    "devDependencies": {
+        "@babel/cli": "^7.17.6",
+        "@babel/core": "^7.17.8",
+        "@babel/preset-env": "^7.16.11",
+        "@babel/preset-react": "^7.16.7",
+        "babel-loader": "^8.2.4",
+        "enzyme": "^3.3.0",
+        "enzyme-adapter-react-16": "^1.1.1",
+        "eslint": "^4.18.1",
+        "eslint-config-standard": "^11.0.0",
+        "eslint-config-standard-react": "^6.0.0",
+        "eslint-plugin-import": "^2.9.0",
+        "eslint-plugin-node": "^6.0.1",
+        "eslint-plugin-promise": "^3.6.0",
+        "eslint-plugin-react": "^7.7.0",
+        "eslint-plugin-standard": "^3.0.1",
+        "html-webpack-plugin": "^5.5.0",
+        "in-publish": "^2.0.0",
+        "jest": "^24.1.0",
+        "pre-push": "^0.1.1",
+        "webpack-cli": "^4.9.2",
+        "webpack-dev-server": "^3.11.1"
+    },
+    "dependencies": {
+        "lrud": "^8.0.0",
+        "react": "^17.0.2",
+        "react-dom": "^17.0.2",
+        "uuid": "^8.3.2"
+    },
+    "pre-push": [
+        "lint",
+        "test"
+    ],
+    "scripts": {
+        "clean": "rm -rf dist",
+        "lint": "eslint src test",
+        "prebuild": "npm run clean",
+        "build": "babel src --out-dir dist",
+        "prepublish": "not-in-install && npm run build || in-install # NPM insanely runs prepublish on npm install: https://github.com/npm/npm/issues/3059",
+        "pretest": "npm run lint",
+        "start": "webpack serve",
+        "test": "jest",
+        "preversion": "npm test",
+        "postversion": "git push && git push --tags",
+        "watch": "npm run build -- --watch"
+    },
+    "jest": {
+        "setupFiles": [
+            "./test/setup"
+        ]
+    }
 }
