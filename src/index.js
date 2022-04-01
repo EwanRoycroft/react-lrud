@@ -71,7 +71,9 @@ const useNavigation = function (props) {
                 props.onBlur?.(event, ref.current);
                 setFocused(false);
             },
-            onSelect: props.onSelect,
+            onSelect: (event) => {
+                props.onSelect?.(event, ref.current);
+            },
             onActive: (event) => {
                 props.onActive?.(event, ref.current);
                 setActive(true);
@@ -80,8 +82,12 @@ const useNavigation = function (props) {
                 props.onInactive?.(event, ref.current);
                 setActive(false);
             },
-            onLeave: props.onLeave,
-            onEnter: props.onEnter,
+            onLeave: (event) => {
+                props.onLeave?.(event, ref.current);
+            },
+            onEnter: (event) => {
+                props.onEnter?.(event, ref.current);
+            },
             shouldCancelLeave: props.shouldCancelLeave,
             shouldCancelEnter: props.shouldCancelEnter,
             onLeaveCancelled: props.onLeaveCancelled,
