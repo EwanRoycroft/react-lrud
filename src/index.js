@@ -4,10 +4,6 @@ import { v4 as uuidv4 } from 'uuid';
 
 let _navigation;
 
-const NavigationContext = createContext(null);
-
-let _debug = false;
-
 const _log = (...args) => console.debug('react-lrud:', ...args);
 
 const _handleKeyEvent = function (event) {
@@ -24,11 +20,9 @@ const _handleKeyEvent = function (event) {
 const initNavigation = function (options) {
     _navigation = new Lrud();
 
-    _debug = options?.debug ?? false;
-
     document.addEventListener('keydown', _handleKeyEvent);
 
-    if (_debug) {
+    if (options?.debug) {
         _navigation.on('focus', (event) => _log('focus:', event));
         _navigation.on('blur', (event) => _log('blur:', event));
         _navigation.on('active', (event) => _log('active:', event));
@@ -43,17 +37,18 @@ const destroyNavigation = function () {
     _navigation = undefined;
 };
 
-const assignFocus = (id) => _navigation.assignFocus(id);
+const NavigationContext = createContext(null);
 
 const useNavigation = function (props) {
     const [id] = useState(props.id ?? uuidv4());
     const [focused, setFocused] = useState(false);
     const [active, setActive] = useState(false);
+    const [disabled, setDisabled] = useState(false);
 
     const ref = useRef(null);
     const parent = useContext(NavigationContext);
 
-    if (!_navigation.getNode(id)) {
+    if (!disabled && !_navigation.getNode(id)) {
         _navigation.registerNode(id, {
             parent: props.parent ?? parent,
             isFocusable: props.isFocusable ?? true,
@@ -95,17 +90,40 @@ const useNavigation = function (props) {
         });
     }
 
+    const unregisterSelf = () => _navigation.unregisterNode(id);
+
     // On component unmount
-    useEffect(() => () => _navigation.unregisterNode(id), [id]);
+    useEffect(() => () => unregisterSelf(), [id]);
 
     return {
         id,
         ref,
         focused,
         active,
-        assignFocus,
+        getNode: () => _navigation.getNode(id),
+        registerSelf: (options) => _navigation.registerNode(id, options),
+        unregisterSelf,
+        setFocusable: (focusable) =>
+            _navigation.setNodeFocusable(id, focusable),
+        setDisabled: (disabled) => {
+            if (disabled) unregisterSelf();
+
+            setDisabled(disabled);
+        },
+        setActiveChild: (child) =>
+            _navigation.setActiveChild(_navigation.getNode(id), child),
     };
 };
+
+const assignFocus = (id) => _navigation.assignFocus(id);
+
+const getCurrentFocusNode = () => _navigation.getCurrentFocusNode();
+
+const getRootNode = () => _navigation.getRootNode();
+
+const insertTree = (tree, options) => _navigation.insertTree(tree, options);
+
+const getNode = (id) => _navigation.getNode(id);
 
 export {
     initNavigation,
@@ -113,4 +131,8 @@ export {
     useNavigation,
     NavigationContext,
     assignFocus,
+    getCurrentFocusNode,
+    getRootNode,
+    insertTree,
+    getNode,
 };
