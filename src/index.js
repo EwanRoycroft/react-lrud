@@ -95,7 +95,8 @@ const useNavigation = function (props) {
         });
     }
 
-    useEffect(() => () => _navigation.unregisterNode(id), []);
+    // On component unmount
+    useEffect(() => () => _navigation.unregisterNode(id), [id]);
 
     return {
         id,

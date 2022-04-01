@@ -1,4 +1,5 @@
-import React, { forwardRef, createRef, useEffect } from 'react';
+import React, { forwardRef, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
 import {
     initNavigation,
@@ -29,6 +30,16 @@ const ScrollView = forwardRef((props, ref) => (
 
 ScrollView.displayName = 'ScrollView';
 
+ScrollView.propTypes = {
+    className: PropTypes.string,
+    style: PropTypes.object,
+    horizontal: PropTypes.bool,
+    children: PropTypes.oneOfType([
+        PropTypes.arrayOf(PropTypes.node),
+        PropTypes.node,
+    ]),
+};
+
 const Item = function (props) {
     const { ref, focused } = useNavigation({
         id: props.id,
@@ -52,6 +63,15 @@ const Item = function (props) {
             {props.children}
         </div>
     );
+};
+
+Item.propTypes = {
+    id: PropTypes.string.isRequired,
+    indexRange: PropTypes.array,
+    onFocus: PropTypes.func,
+    onSelect: PropTypes.func,
+    style: PropTypes.object,
+    children: PropTypes.node,
 };
 
 const Nav = function (props) {
@@ -90,6 +110,11 @@ const Nav = function (props) {
             </nav>
         </NavigationContext.Provider>
     );
+};
+
+Nav.propTypes = {
+    id: PropTypes.string.isRequired,
+    onActive: PropTypes.func,
 };
 
 const Row = function (props) {
@@ -153,6 +178,13 @@ const Row = function (props) {
     );
 };
 
+Row.propTypes = {
+    id: PropTypes.string.isRequired,
+    onActive: PropTypes.func,
+    columns: PropTypes.number.isRequired,
+    columnTemplate: PropTypes.array,
+};
+
 const Grid = function (props) {
     const { ref, active } = useNavigation({
         orientation: 'vertical',
@@ -193,6 +225,11 @@ const Grid = function (props) {
             </div>
         </NavigationContext.Provider>
     );
+};
+
+Grid.propTypes = {
+    id: PropTypes.string.isRequired,
+    onActive: PropTypes.func,
 };
 
 const Rail = function (props) {
@@ -250,6 +287,11 @@ const Rail = function (props) {
     );
 };
 
+Rail.propTypes = {
+    id: PropTypes.string.isRequired,
+    onActive: PropTypes.func,
+};
+
 const App = function () {
     const id = 'root';
 
@@ -259,7 +301,7 @@ const App = function () {
         isFocusable: false,
     });
 
-    useEffect(() => assignFocus('nav_page0'), []);
+    useEffect(() => assignFocus('nav_page0'));
 
     const handleActivation = (event, element) =>
         ref.current.scrollTo({
