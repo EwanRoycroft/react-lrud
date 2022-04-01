@@ -132,12 +132,12 @@ const Nav = function (props) {
         const handleKeyEvent = (event) => {
             if (event.code === 'Backspace') {
                 event.preventDefault();
-            history.goBack();
+                history.goBack();
             }
         };
 
         document.addEventListener('keydown', handleKeyEvent);
-        () => document.removeEventListener('keydown', handleKeyEvent);
+        return () => document.removeEventListener('keydown', handleKeyEvent);
     });
 
     const itemStyle = { flexGrow: '4', height: '50px', lineHeight: '50px' };
