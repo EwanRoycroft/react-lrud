@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect } from 'react';
+import React, { forwardRef, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
 import {
@@ -6,17 +6,43 @@ import {
     useNavigation,
     NavigationContext,
     assignFocus,
+    registerTree,
 } from '../src';
 import {
     HashRouter as Router,
-    Switch,
-    Route,
     Redirect,
     useHistory,
     useLocation,
 } from 'react-router-dom';
+import {
+    CacheSwitch,
+    CacheRoute,
+    useDidCache,
+    useDidRecover,
+} from 'react-router-cache-route';
 
 initNavigation({ debug: true });
+
+const useCacheNavigation = function (props) {
+    const [cachedNode, setCachedNode] = useState(null);
+
+    const navigation = useNavigation(props);
+
+    useDidCache(() => {
+        const node = navigation.getNode();
+
+        navigation.setDisabled(true);
+
+        setCachedNode(node);
+    });
+
+    useDidRecover(() => {
+        registerTree(cachedNode);
+        navigation.setDisabled(false);
+    });
+
+    return navigation;
+};
 
 const padding = 30;
 const behavior = 'smooth';
@@ -93,10 +119,26 @@ const Nav = function (props) {
 
     const location = useLocation();
 
+    const currentPage = location.pathname.replace('/', '');
+
+    const effectDeps = !currentPage && currentPage;
+
     useEffect(
-        () => assignFocus(`${props.id}_${location.pathname.replace('/', '')}`),
-        []
+        () => currentPage && assignFocus(`${props.id}_${currentPage}`),
+        [effectDeps]
     );
+
+    useEffect(() => {
+        const handleKeyEvent = (event) => {
+            if (event.code === 'Backspace') {
+                event.preventDefault();
+            history.goBack();
+            }
+        };
+
+        document.addEventListener('keydown', handleKeyEvent);
+        () => document.removeEventListener('keydown', handleKeyEvent);
+    });
 
     const itemStyle = { flexGrow: '4', height: '50px', lineHeight: '50px' };
 
@@ -203,7 +245,7 @@ Row.propTypes = {
 };
 
 const Grid = function (props) {
-    const { ref, active } = useNavigation({
+    const { ref, active } = useCacheNavigation({
         orientation: 'vertical',
         isIndexAlign: true,
         isFocusable: false,
@@ -250,7 +292,7 @@ Grid.propTypes = {
 };
 
 const Rail = function (props) {
-    const { ref, active } = useNavigation({
+    const { ref, active } = useCacheNavigation({
         orientation: 'horizontal',
         id: props.id,
         isWrapping: true,
@@ -344,12 +386,12 @@ const App = function () {
                 >
                     <Router>
                         <Nav id="nav" onActive={handleActivation} />
-                        <Switch>
+                        <CacheSwitch>
                             <Redirect exact from="/" to="/page0" />
-                            <Route path="/page0">
+                            <CacheRoute path="/page0">
                                 <Grid id="grid" onActive={handleActivation} />
-                            </Route>
-                            <Route path="/page1">
+                            </CacheRoute>
+                            <CacheRoute path="/page1">
                                 {new Array(5)
                                     .fill(undefined)
                                     .map((value, key) => (
@@ -359,8 +401,8 @@ const App = function () {
                                             onActive={handleActivation}
                                         />
                                     ))}
-                            </Route>
-                        </Switch>
+                            </CacheRoute>
+                        </CacheSwitch>
                     </Router>
                 </div>
             </ScrollView>
