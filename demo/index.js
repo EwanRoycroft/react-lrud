@@ -5,13 +5,11 @@ import {
     useNavigation,
     NavigationContext,
     assignFocus,
-    addNavigationEventListener,
-    removeNavigationEventListener,
 } from '../src';
 
 initNavigation({ debug: true });
 
-const padding = 50;
+const padding = 30;
 const behavior = 'smooth';
 
 const ScrollView = forwardRef((props, ref) => (
@@ -74,7 +72,7 @@ const Nav = function (props) {
                     justifyContent: 'space-between',
                     flexGrow: '4',
                     gap: `${padding}px`,
-                    padding: `25px ${padding}px`,
+                    padding: `${padding}px`,
                     outline: active ? '1px dashed red' : '1px dashed grey',
                 }}
                 ref={ref}
@@ -108,13 +106,15 @@ const Row = function (props) {
 
     let startLine = 1;
 
+    const itemHeight = 100;
+
     return (
         <NavigationContext.Provider value={props.id}>
             <div
                 style={{
                     display: 'grid',
-                    gridTemplateColumns: `repeat(${numColumns}, 100px)`,
-                    gridTemplateRows: '100px',
+                    gridTemplateColumns: `repeat(${numColumns}, ${itemHeight}px)`,
+                    gridTemplateRows: `${itemHeight}px`,
                     gap: `${padding}px`,
                     outline: active ? '1px dashed red' : '1px dashed grey',
                 }}
@@ -132,11 +132,11 @@ const Row = function (props) {
                             onFocus={(event, element) =>
                                 ref.current.scrollTo({
                                     left: element.offsetLeft - padding,
-                                    behavior: 'smooth',
+                                    behavior,
                                 })
                             }
                             style={{
-                                lineHeight: '100px',
+                                lineHeight: `${itemHeight}px`,
                                 gridColumn: `${startLine} / span ${columnSpan[key]}`,
                             }}
                         >
@@ -203,13 +203,15 @@ const Rail = function (props) {
         onActive: props.onActive,
     });
 
+    const itemHeight = 100;
+
     return (
         <NavigationContext.Provider value={props.id}>
             <ScrollView
                 horizontal
                 style={{
                     width: '100%',
-                    height: '200px',
+                    height: `${itemHeight + 2 * padding}px`,
                     boxSizing: 'border-box',
                     outline: active ? '1px dashed red' : '1px dashed grey',
                 }}
@@ -219,8 +221,8 @@ const Rail = function (props) {
                     style={{
                         width: 'fit-content',
                         display: 'grid',
-                        gridTemplateColumns: 'repeat(10, 100px)',
-                        gridTemplateRows: '100px',
+                        gridTemplateColumns: `repeat(10, ${itemHeight}px)`,
+                        gridTemplateRows: `${itemHeight}px`,
                         gap: `${padding}px`,
                         alignItems: 'center',
                         padding: `${padding}px`,
@@ -234,10 +236,10 @@ const Rail = function (props) {
                             onFocus={(event, element) =>
                                 ref.current.scrollTo({
                                     left: element.offsetLeft - padding,
-                                    behavior: 'smooth',
+                                    behavior,
                                 })
                             }
-                            style={{ lineHeight: '100px' }}
+                            style={{ lineHeight: `${itemHeight}px` }}
                         >
                             {key}
                         </Item>
@@ -262,7 +264,7 @@ const App = function () {
     const handleActivation = (event, element) =>
         ref.current.scrollTo({
             top: element.offsetTop - padding,
-            behavior: 'smooth',
+            behavior,
         });
 
     return (
