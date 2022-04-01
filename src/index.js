@@ -1,15 +1,33 @@
-import { useState, useEffect } from 'react';
+import {
+    createContext,
+    useContext,
+    createRef,
+    useState,
+    useEffect,
+} from 'react';
 import { Lrud } from 'lrud';
 import { v4 as uuidv4 } from 'uuid';
+import EventEmitter from 'events';
 
 let _navigation;
+
+const NavigationContext = createContext(null);
+
 let _debug = false;
 
 const _log = (...args) => console.debug('react-lrud:', ...args);
 
+const _eventEmitter = new EventEmitter();
+
 const _handleKeyEvent = function (event) {
-    event.preventDefault();
-    _navigation.handleKeyEvent(event);
+    if (
+        ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Enter'].includes(
+            event.code
+        )
+    ) {
+        event.preventDefault();
+        _navigation.handleKeyEvent(event);
+    }
 };
 
 const initNavigation = function (options) {
@@ -42,9 +60,12 @@ const useNavigation = function (props) {
     const [id] = useState(props.id ?? uuidv4());
     const [focused, setFocused] = useState(false);
 
+    const ref = createRef();
+    const parent = useContext(NavigationContext);
+
     if (!_navigation.getNode(id)) {
         _navigation.registerNode(id, {
-            parent: props.parent,
+            parent: props.parent ?? parent,
             isFocusable: props.isFocusable ?? true,
             orientation: props.orientation,
             isWrapping: props.isWrapping,
@@ -53,16 +74,14 @@ const useNavigation = function (props) {
             indexRange: props.indexRange,
             isStopPropagate: props.isStopPropagate,
             onFocus: (event) => {
-                if (event.id === id) {
-                    setFocused(true);
-                    props.onFocus?.(event);
-                }
+                props.onFocus?.(event);
+                // _eventEmitter.emit('focus', { element: ref.current, event });
+                setFocused(true);
             },
             onBlur: (event) => {
-                if (event.id === id) {
-                    setFocused(false);
-                    props.onBlur?.(event);
-                }
+                props.onBlur?.(event);
+                // _eventEmitter.emit('blur', { element: ref.current, event });
+                setFocused(false);
             },
             onSelect: props.onSelect,
             onActive: props.onActive,
@@ -80,9 +99,24 @@ const useNavigation = function (props) {
 
     return {
         id,
+        ref,
         focused,
         assignFocus,
     };
 };
 
-export { initNavigation, destroyNavigation, useNavigation, assignFocus };
+const addNavigationEventListener = (type, listener) =>
+    _eventEmitter.on(type, listener);
+
+const removeNavigationEventListener = (type, listener) =>
+    _eventEmitter.off(type, listener);
+
+export {
+    initNavigation,
+    destroyNavigation,
+    useNavigation,
+    NavigationContext,
+    assignFocus,
+    addNavigationEventListener,
+    removeNavigationEventListener,
+};
