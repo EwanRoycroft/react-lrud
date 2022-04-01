@@ -6,7 +6,6 @@ module.exports = {
     mode: 'development',
     output: {
         path: path.resolve(__dirname, 'build'),
-        // publicPath: '/build',
         libraryTarget: 'umd',
         filename: 'main.bundle.js',
     },

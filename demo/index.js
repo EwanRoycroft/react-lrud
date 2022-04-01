@@ -7,6 +7,14 @@ import {
     NavigationContext,
     assignFocus,
 } from '../src';
+import {
+    HashRouter as Router,
+    Switch,
+    Route,
+    Redirect,
+    useHistory,
+    useLocation,
+} from 'react-router-dom';
 
 initNavigation({ debug: true });
 
@@ -81,6 +89,15 @@ const Nav = function (props) {
         onActive: props.onActive,
     });
 
+    const history = useHistory();
+
+    const location = useLocation();
+
+    useEffect(
+        () => assignFocus(`${props.id}_${location.pathname.replace('/', '')}`),
+        []
+    );
+
     const itemStyle = { flexGrow: '4', height: '50px', lineHeight: '50px' };
 
     return (
@@ -102,7 +119,7 @@ const Nav = function (props) {
                         key={key}
                         id={`${props.id}_page${key}`}
                         style={itemStyle}
-                        onSelect={() => console.log(`Selected page ${key}`)}
+                        onSelect={() => history.push(`/page${key}`)}
                     >
                         Page {key}
                     </Item>
@@ -261,7 +278,6 @@ const Rail = function (props) {
                         gridTemplateColumns: `repeat(10, ${itemHeight}px)`,
                         gridTemplateRows: `${itemHeight}px`,
                         gap: `${padding}px`,
-                        alignItems: 'center',
                         padding: `${padding}px`,
                         paddingRight: '100%',
                     }}
@@ -301,8 +317,6 @@ const App = function () {
         isFocusable: false,
     });
 
-    useEffect(() => assignFocus('nav_page0'));
-
     const handleActivation = (event, element) =>
         ref.current.scrollTo({
             top: element.offsetTop - padding,
@@ -316,22 +330,39 @@ const App = function () {
                 style={{
                     width: '100%',
                     height: '100%',
-                    padding: `${padding}px`,
-                    display: 'grid',
-                    gap: `${padding}px`,
-                    boxSizing: 'border-box',
-                    textAlign: 'center',
                 }}
             >
-                <Nav id="nav" onActive={handleActivation} />
-                <Grid id="grid" onActive={handleActivation} />
-                {new Array(3).fill(undefined).map((value, key) => (
-                    <Rail
-                        key={key}
-                        id={`rail${key}`}
-                        onActive={handleActivation}
-                    />
-                ))}
+                <div
+                    style={{
+                        width: '100%',
+                        padding: `${padding}px`,
+                        display: 'grid',
+                        gap: `${padding}px`,
+                        boxSizing: 'border-box',
+                        textAlign: 'center',
+                    }}
+                >
+                    <Router>
+                        <Nav id="nav" onActive={handleActivation} />
+                        <Switch>
+                            <Redirect exact from="/" to="/page0" />
+                            <Route path="/page0">
+                                <Grid id="grid" onActive={handleActivation} />
+                            </Route>
+                            <Route path="/page1">
+                                {new Array(5)
+                                    .fill(undefined)
+                                    .map((value, key) => (
+                                        <Rail
+                                            key={key}
+                                            id={`rail${key}`}
+                                            onActive={handleActivation}
+                                        />
+                                    ))}
+                            </Route>
+                        </Switch>
+                    </Router>
+                </div>
             </ScrollView>
         </NavigationContext.Provider>
     );
