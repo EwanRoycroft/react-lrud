@@ -50,7 +50,7 @@ const behavior = 'smooth';
 const ScrollView = forwardRef((props, ref) => (
     <div
         ref={ref}
-        className={`scroll-view ${props.className}`}
+        className={`scroll-view ${props.className ?? ''}`}
         style={{
             ...props.style,
             position: 'relative',
@@ -58,7 +58,17 @@ const ScrollView = forwardRef((props, ref) => (
             overflowY: props.horizontal ? 'hidden' : 'scroll',
         }}
     >
-        {props.children}
+        <div
+            style={{
+                width: '100%',
+                display: 'grid',
+                gridTemplateColumns: '100%',
+                boxSizing: 'border-box',
+                gap: `${padding}px`,
+            }}
+        >
+            {props.children}
+        </div>
     </div>
 ));
 
@@ -306,6 +316,8 @@ const Rail = function (props) {
 
     const itemHeight = 100;
 
+    const history = useHistory();
+
     return (
         <NavigationContext.Provider value={props.id}>
             <ScrollView
@@ -340,6 +352,7 @@ const Rail = function (props) {
                                 })
                             }
                             style={{ lineHeight: `${itemHeight}px` }}
+                            onSelect={() => history.push(`/page2`)}
                         >
                             {key}
                         </Item>
@@ -355,8 +368,8 @@ Rail.propTypes = {
     onActive: PropTypes.func,
 };
 
-const App = function () {
-    const id = 'root';
+const Page0 = function () {
+    const id = 'page0';
 
     const { ref } = useNavigation({
         id,
@@ -371,47 +384,88 @@ const App = function () {
         });
 
     return (
+        <ScrollView
+            ref={ref}
+            style={{
+                width: '100%',
+                height: '500px',
+            }}
+        >
+            <Grid id="grid" onActive={handleActivation} />
+        </ScrollView>
+    );
+};
+
+const Page1 = function () {
+    const id = 'page1';
+
+    const { ref } = useNavigation({
+        id,
+        orientation: 'vertical',
+        isFocusable: false,
+    });
+
+    const handleActivation = (event, element) =>
+        ref.current.scrollTo({
+            top: element.offsetTop - padding,
+            behavior,
+        });
+
+    return (
+        <ScrollView
+            ref={ref}
+            style={{
+                width: '100%',
+                height: '500px',
+            }}
+        >
+            {new Array(5).fill(undefined).map((value, key) => (
+                <Rail key={key} id={`rail${key}`} onActive={handleActivation} />
+            ))}
+        </ScrollView>
+    );
+};
+
+const App = function () {
+    const id = 'root';
+
+    const { ref } = useNavigation({
+        id,
+        orientation: 'vertical',
+        isFocusable: false,
+    });
+
+    return (
         <NavigationContext.Provider value={id}>
-            <ScrollView
+            <div
                 ref={ref}
                 style={{
                     width: '100%',
                     height: '100%',
+                    padding: `${padding}px`,
+                    display: 'grid',
+                    gridTemplateColumns: '100%',
+                    gap: `${padding}px`,
+                    boxSizing: 'border-box',
+                    textAlign: 'center',
                 }}
             >
-                <div
-                    style={{
-                        width: '100%',
-                        padding: `${padding}px`,
-                        display: 'grid',
-                        gridTemplateColumns: '100%',
-                        gap: `${padding}px`,
-                        boxSizing: 'border-box',
-                        textAlign: 'center',
-                    }}
-                >
-                    <Router>
-                        <Nav id="nav" onActive={handleActivation} />
-                        <CacheSwitch>
-                            <Redirect exact from="/" to="/page0" />
-                            <CacheRoute path="/page0">
-                                <Grid id="grid" onActive={handleActivation} />
-                            </CacheRoute>
-                            <CacheRoute path="/page1">
-                                {new Array(5)
-                                    .fill(undefined)
-                                    .map((value, key) => (
-                                        <Rail
-                                            key={key}
-                                            id={`rail${key}`}
-                                            onActive={handleActivation}
-                                        />
-                                    ))}
-                            </CacheRoute>
-                        </CacheSwitch>
-                    </Router>
-                </div>
-            </ScrollView>
+                <Router>
+                    <Nav id="nav" />
+                    <CacheSwitch>
+                        <Redirect exact from="/" to="/page0" />
+                        <CacheRoute path="/page0">
+                            <Page0 />
+                        </CacheRoute>
+                        <CacheRoute path="/page1">
+                            <Page1 />
+                        </CacheRoute>
+                        <CacheRoute path="/page2">
+                            <div style={{ height: '500px' }}></div>
+                        </CacheRoute>
+                    </CacheSwitch>
+                </Router>
+            </div>
         </NavigationContext.Provider>
     );
 };
