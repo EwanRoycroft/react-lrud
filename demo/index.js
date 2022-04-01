@@ -35,6 +35,7 @@ const Item = function (props) {
     const { ref, focused } = useNavigation({
         id: props.id,
         isFocusable: true,
+        onFocus: props.onFocus,
     });
 
     return (
@@ -42,7 +43,7 @@ const Item = function (props) {
             ref={ref}
             style={{
                 height: '100%',
-                outline: focused ? '3px solid red' : '1px solid black',
+                border: focused ? '3px solid red' : '1px solid black',
             }}
             className="item"
             id={props.id}
@@ -53,9 +54,11 @@ const Item = function (props) {
 };
 
 const Rail = function (props) {
-    const { ref, focused } = useNavigation({
+    const { ref, active } = useNavigation({
         orientation: 'horizontal',
         id: props.id,
+        isWrapping: true,
+        onActive: props.onActive,
     });
 
     return (
@@ -66,7 +69,7 @@ const Rail = function (props) {
                     width: '100%',
                     height: '200px',
                     boxSizing: 'border-box',
-                    outline: focused ? '1px dashed red' : '1px dashed grey',
+                    border: active ? '1px dashed red' : '1px dashed grey',
                 }}
                 ref={ref}
             >
@@ -87,6 +90,12 @@ const Rail = function (props) {
                             key={key}
                             id={`${props.id}_item${key}`}
                             number={key}
+                            onFocus={(event, element) =>
+                                ref.current.scrollTo({
+                                    left: element.offsetLeft - padding,
+                                    behavior: 'smooth',
+                                })
+                            }
                         />
                     ))}
                 </div>
@@ -106,19 +115,6 @@ const App = function () {
 
     useEffect(() => assignFocus('rail0_item0'), []);
 
-    useEffect(function () {
-        // const handleFocusEvent = ({ element, event }) => {
-        //     // if (event.parent?.id !== id) return;
-        //     console.log(element, event);
-        //     ref.current.scrollTo({
-        //         top: element.offsetTop,
-        //         behavior: 'smooth',
-        //     });
-        // };
-        // addNavigationEventListener('focus', handleFocusEvent);
-        // return () => removeNavigationEventListener('focus', handleFocusEvent);
-    });
-
     return (
         <NavigationContext.Provider value={id}>
             <ScrollView
@@ -132,11 +128,18 @@ const App = function () {
                     boxSizing: 'border-box',
                 }}
             >
-                <Rail id="rail0" />
-                <Rail id="rail1" />
-                <Rail id="rail2" />
-                <Rail id="rail3" />
-                <Rail id="rail4" />
+                {new Array(5).fill(undefined).map((value, key) => (
+                    <Rail
+                        key={key}
+                        id={`rail${key}`}
+                        onActive={(event, element) =>
+                            ref.current.scrollTo({
+                                top: element.offsetTop - padding,
+                                behavior: 'smooth',
+                            })
+                        }
+                    />
+                ))}
             </ScrollView>
         </NavigationContext.Provider>
     );

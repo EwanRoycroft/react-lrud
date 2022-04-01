@@ -1,13 +1,6 @@
-import {
-    createContext,
-    useContext,
-    createRef,
-    useState,
-    useEffect,
-} from 'react';
+import { createContext, useContext, useRef, useState, useEffect } from 'react';
 import { Lrud } from 'lrud';
 import { v4 as uuidv4 } from 'uuid';
-import EventEmitter from 'events';
 
 let _navigation;
 
@@ -16,8 +9,6 @@ const NavigationContext = createContext(null);
 let _debug = false;
 
 const _log = (...args) => console.debug('react-lrud:', ...args);
-
-const _eventEmitter = new EventEmitter();
 
 const _handleKeyEvent = function (event) {
     if (
@@ -52,15 +43,14 @@ const destroyNavigation = function () {
     _navigation = undefined;
 };
 
-const assignFocus = (id) => {
-    _navigation.assignFocus(id);
-};
+const assignFocus = (id) => _navigation.assignFocus(id);
 
 const useNavigation = function (props) {
     const [id] = useState(props.id ?? uuidv4());
     const [focused, setFocused] = useState(false);
+    const [active, setActive] = useState(false);
 
-    const ref = createRef();
+    const ref = useRef(null);
     const parent = useContext(NavigationContext);
 
     if (!_navigation.getNode(id)) {
@@ -74,18 +64,22 @@ const useNavigation = function (props) {
             indexRange: props.indexRange,
             isStopPropagate: props.isStopPropagate,
             onFocus: (event) => {
-                props.onFocus?.(event);
-                // _eventEmitter.emit('focus', { element: ref.current, event });
+                props.onFocus?.(event, ref.current);
                 setFocused(true);
             },
             onBlur: (event) => {
-                props.onBlur?.(event);
-                // _eventEmitter.emit('blur', { element: ref.current, event });
+                props.onBlur?.(event, ref.current);
                 setFocused(false);
             },
             onSelect: props.onSelect,
-            onActive: props.onActive,
-            onInactive: props.onInactive,
+            onActive: (event) => {
+                props.onActive?.(event, ref.current);
+                setActive(true);
+            },
+            onInactive: (event) => {
+                props.onInactive?.(event, ref.current);
+                setActive(false);
+            },
             onLeave: props.onLeave,
             onEnter: props.onEnter,
             shouldCancelLeave: props.shouldCancelLeave,
@@ -101,15 +95,10 @@ const useNavigation = function (props) {
         id,
         ref,
         focused,
+        active,
         assignFocus,
     };
 };
-
-const addNavigationEventListener = (type, listener) =>
-    _eventEmitter.on(type, listener);
-
-const removeNavigationEventListener = (type, listener) =>
-    _eventEmitter.off(type, listener);
 
 export {
     initNavigation,
@@ -117,6 +106,4 @@ export {
     useNavigation,
     NavigationContext,
     assignFocus,
-    addNavigationEventListener,
-    removeNavigationEventListener,
 };
