@@ -160,7 +160,12 @@ const Nav = function (props) {
                     <Item
                         key={key}
                         id={`${props.id}_page${key}`}
-                        style={itemStyle}
+                        style={{
+                            ...itemStyle,
+                            backgroundColor:
+                                currentPage === `page${key}` && 'blue',
+                            color: currentPage === `page${key}` && 'white',
+                        }}
                         onSelect={() => history.push(`/page${key}`)}
                     >
                         Page {key}
@@ -379,6 +384,7 @@ const App = function () {
                         width: '100%',
                         padding: `${padding}px`,
                         display: 'grid',
+                        gridTemplateColumns: '100%',
                         gap: `${padding}px`,
                         boxSizing: 'border-box',
                         textAlign: 'center',
