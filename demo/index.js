@@ -6,7 +6,8 @@ import {
     useNavigation,
     NavigationContext,
     assignFocus,
-    registerTree,
+    insertTree,
+    getCurrentFocusNode,
 } from '../src';
 import {
     HashRouter as Router,
@@ -25,19 +26,39 @@ initNavigation({ debug: true });
 
 const useCacheNavigation = function (props) {
     const [cachedNode, setCachedNode] = useState(null);
+    const [cachedFocus, setCachedFocus] = useState(null);
 
     const navigation = useNavigation(props);
 
     useDidCache(() => {
         const node = navigation.getNode();
 
+        if (navigation.active) {
+            // The current focus is within this component, so cache it
+            setCachedFocus(getCurrentFocusNode());
+        }
+
         navigation.setDisabled(true);
+
+        // insertTree only accepts the parent ID, not the full object
+        node.parent = node.parent.id;
+
+        // Index is not reliable as it may have been recalculated as items were
+        // removed from the tree when caching. It should be deleted so it
+        // doesn't override the navigation order when the items are restored.
+        delete node.index;
 
         setCachedNode(node);
     });
 
     useDidRecover(() => {
-        registerTree(cachedNode);
+        insertTree(cachedNode, { maintainIndex: false });
+
+        if (cachedFocus) {
+            assignFocus(cachedFocus.id);
+            setCachedFocus(null);
+        }
+
         navigation.setDisabled(false);
     });
 
