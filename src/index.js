@@ -54,7 +54,7 @@ const useNavigation = function (props) {
     const parent = useContext(NavigationContext);
 
     if (!disabled && !_navigation.getNode(id)) {
-        _navigation.registerNode(id, {
+        const options = {
             parent: props.parent ?? parent,
             isFocusable: props.isFocusable ?? true,
             orientation: props.orientation,
@@ -92,8 +92,10 @@ const useNavigation = function (props) {
             shouldCancelEnter: props.shouldCancelEnter,
             onLeaveCancelled: props.onLeaveCancelled,
             onEnterCancelled: props.onEnterCancelled,
-        });
-        _log('registered node:', id);
+        };
+
+        _navigation.registerNode(id, options);
+        _log('registered node:', id, options);
     }
 
     const unregisterSelf = () => {
