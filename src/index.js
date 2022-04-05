@@ -59,7 +59,7 @@ const useNavigation = function (props) {
         const options = {
             parent: props.parent ?? parent,
             isFocusable: props.isFocusable ?? true,
-            orientation: props.orientation,
+            orientation: props.orientation ?? 'vertical',
             isWrapping: props.isWrapping,
             index: props.index,
             isIndexAlign: props.isIndexAlign,
