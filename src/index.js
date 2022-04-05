@@ -44,6 +44,8 @@ const destroyNavigation = function () {
 
 const NavigationContext = createContext(null);
 
+let _focusIntentId;
+
 const useNavigation = function (props) {
     const [id] = useState(props.id ?? uuidv4());
     const [focused, setFocused] = useState(false);
@@ -103,6 +105,13 @@ const useNavigation = function (props) {
         _log('unregistered node:', id);
     };
 
+    useEffect(() => {
+        if (id === _focusIntentId) {
+            assignFocus(id);
+            _focusIntentId = undefined;
+        }
+    });
+
     // On component unmount
     useEffect(() => () => unregisterSelf(), [id]);
 
@@ -126,7 +135,15 @@ const useNavigation = function (props) {
     };
 };
 
-const assignFocus = (id) => _navigation.assignFocus(id);
+const assignFocus = function (id) {
+    if (_navigation.getNode(id)) {
+        _log('assigned focus:', id);
+        _navigation.assignFocus(id);
+    } else {
+        _log('focus intent:', id);
+        _focusIntentId = id;
+    }
+};
 
 const getCurrentFocusNode = () => _navigation.getCurrentFocusNode();
 
