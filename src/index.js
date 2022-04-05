@@ -4,7 +4,9 @@ import { v4 as uuidv4 } from 'uuid';
 
 let _navigation;
 
-const _log = (...args) => console.debug('react-lrud:', ...args);
+let _debug = false;
+
+const _log = (...args) => _debug && console.debug('react-lrud:', ...args);
 
 const _handleKeyEvent = function (event) {
     if (
@@ -22,13 +24,16 @@ const initNavigation = function (options) {
 
     document.addEventListener('keydown', _handleKeyEvent);
 
-    if (options?.debug) {
+    _debug = options?.debug ?? false;
+
+    if (_debug) {
         _navigation.on('focus', (event) => _log('focus:', event));
         _navigation.on('blur', (event) => _log('blur:', event));
         _navigation.on('active', (event) => _log('active:', event));
         _navigation.on('inactive', (event) => _log('inactive:', event));
         _navigation.on('select', (event) => _log('select:', event));
         _navigation.on('cancelled', (event) => _log('cancelled:', event));
+        _navigation.on('move', (event) => _log('move:', event));
     }
 };
 
@@ -88,9 +93,13 @@ const useNavigation = function (props) {
             onLeaveCancelled: props.onLeaveCancelled,
             onEnterCancelled: props.onEnterCancelled,
         });
+        _log('registered node:', id);
     }
 
-    const unregisterSelf = () => _navigation.unregisterNode(id);
+    const unregisterSelf = () => {
+        _navigation.unregisterNode(id);
+        _log('unregistered node:', id);
+    };
 
     // On component unmount
     useEffect(() => () => unregisterSelf(), [id]);
