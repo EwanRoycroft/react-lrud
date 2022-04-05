@@ -96,7 +96,7 @@ const useNavigation = function (props) {
     useEffect(() => () => unregisterSelf(), [id]);
 
     return {
-        id,
+        actualId: id,
         ref,
         focused,
         active,
