@@ -47,7 +47,7 @@ const NavigationContext = createContext(null);
 let _focusIntentId;
 
 const useNavigation = function (props) {
-    const [id] = useState(props.id ?? uuidv4());
+    const [id] = useState(props?.id ?? uuidv4());
     const [focused, setFocused] = useState(false);
     const [active, setActive] = useState(false);
     const [disabled, setDisabled] = useState(false);
@@ -57,43 +57,43 @@ const useNavigation = function (props) {
 
     if (!disabled && !_navigation.getNode(id)) {
         const options = {
-            parent: props.parent ?? parent,
-            isFocusable: props.isFocusable ?? true,
-            orientation: props.orientation ?? 'vertical',
-            isWrapping: props.isWrapping,
-            index: props.index,
-            isIndexAlign: props.isIndexAlign,
-            indexRange: props.indexRange,
-            isStopPropagate: props.isStopPropagate,
+            parent: props?.parent ?? parent,
+            isFocusable: props?.isFocusable ?? true,
+            orientation: props?.orientation ?? 'vertical',
+            isWrapping: props?.isWrapping,
+            index: props?.index,
+            isIndexAlign: props?.isIndexAlign,
+            indexRange: props?.indexRange,
+            isStopPropagate: props?.isStopPropagate,
             onFocus: (event) => {
-                props.onFocus?.(event, ref.current);
+                props?.onFocus?.(event, ref.current);
                 setFocused(true);
             },
             onBlur: (event) => {
-                props.onBlur?.(event, ref.current);
+                props?.onBlur?.(event, ref.current);
                 setFocused(false);
             },
             onSelect: (event) => {
-                props.onSelect?.(event, ref.current);
+                props?.onSelect?.(event, ref.current);
             },
             onActive: (event) => {
-                props.onActive?.(event, ref.current);
+                props?.onActive?.(event, ref.current);
                 setActive(true);
             },
             onInactive: (event) => {
-                props.onInactive?.(event, ref.current);
+                props?.onInactive?.(event, ref.current);
                 setActive(false);
             },
             onLeave: (event) => {
-                props.onLeave?.(event, ref.current);
+                props?.onLeave?.(event, ref.current);
             },
             onEnter: (event) => {
-                props.onEnter?.(event, ref.current);
+                props?.onEnter?.(event, ref.current);
             },
-            shouldCancelLeave: props.shouldCancelLeave,
-            shouldCancelEnter: props.shouldCancelEnter,
-            onLeaveCancelled: props.onLeaveCancelled,
-            onEnterCancelled: props.onEnterCancelled,
+            shouldCancelLeave: props?.shouldCancelLeave,
+            shouldCancelEnter: props?.shouldCancelEnter,
+            onLeaveCancelled: props?.onLeaveCancelled,
+            onEnterCancelled: props?.onEnterCancelled,
         };
 
         _navigation.registerNode(id, options);
