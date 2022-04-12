@@ -1,6 +1,7 @@
 import { createContext, useContext, useRef, useState, useEffect } from 'react';
 import { Lrud } from 'lrud';
 import { v4 as uuidv4 } from 'uuid';
+import EventEmitter from 'events';
 
 let _navigation;
 
@@ -52,6 +53,13 @@ const useNavigation = function (props) {
     const [active, setActive] = useState(false);
     const [disabled, setDisabled] = useState(false);
 
+    // We can't just pass props functions as the regsitration options because
+    // this will create a closure that won't update if props change. We can't
+    // re-register the node with new options because this will create a render
+    // loop. The solution is to emit events from the node and register new event
+    // listeners when the props change.
+    const [eventEmitter] = useState(new EventEmitter());
+
     const ref = useRef(null);
     const parent = useContext(NavigationContext);
 
@@ -66,39 +74,71 @@ const useNavigation = function (props) {
             indexRange: props?.indexRange,
             isStopPropagate: props?.isStopPropagate,
             onFocus: (event) => {
-                props?.onFocus?.(event, ref.current);
+                eventEmitter.emit('focus', event, ref.current);
                 setFocused(true);
             },
             onBlur: (event) => {
-                props?.onBlur?.(event, ref.current);
+                eventEmitter.emit('blur', event, ref.current);
                 setFocused(false);
             },
             onSelect: (event) => {
-                props?.onSelect?.(event, ref.current);
+                eventEmitter.emit('select', event, ref.current);
             },
             onActive: (event) => {
-                props?.onActive?.(event, ref.current);
+                eventEmitter.emit('active', event, ref.current);
                 setActive(true);
             },
             onInactive: (event) => {
-                props?.onInactive?.(event, ref.current);
+                eventEmitter.emit('inactive', event, ref.current);
                 setActive(false);
             },
             onLeave: (event) => {
-                props?.onLeave?.(event, ref.current);
+                eventEmitter.emit('leave', event, ref.current);
             },
             onEnter: (event) => {
-                props?.onEnter?.(event, ref.current);
+                eventEmitter.emit('enter', event, ref.current);
             },
             shouldCancelLeave: props?.shouldCancelLeave,
             shouldCancelEnter: props?.shouldCancelEnter,
-            onLeaveCancelled: props?.onLeaveCancelled,
-            onEnterCancelled: props?.onEnterCancelled,
+            onLeaveCancelled: (event) => {
+                eventEmitter.emit('leaveCancelled', event, ref.current);
+            },
+            onEnterCancelled: (event) => {
+                eventEmitter.emit('enterCancelled', event, ref.current);
+            },
         };
 
         _navigation.registerNode(id, options);
         _log('registered node:', id, options);
     }
+
+    useEffect(() => {
+        props?.onFocus && eventEmitter.on('focus', props.onFocus);
+        props?.onBlur && eventEmitter.on('blur', props.onBlur);
+        props?.onSelect && eventEmitter.on('select', props.onSelect);
+        props?.onActive && eventEmitter.on('active', props.onActive);
+        props?.onInactive && eventEmitter.on('inactive', props.onInactive);
+        props?.onLeave && eventEmitter.on('leave', props.onLeave);
+        props?.onEnter && eventEmitter.on('enter', props.onEnter);
+        props?.onLeaveCancelled &&
+            eventEmitter.on('leaveCancelled', props.onLeaveCancelled);
+        props?.onEnterCancelled &&
+            eventEmitter.on('enterCancelled', props.onEnterCancelled);
+
+        return () => {
+            props?.onFocus && eventEmitter.off('focus', props.onFocus);
+            props?.onBlur && eventEmitter.off('blur', props.onBlur);
+            props?.onSelect && eventEmitter.off('select', props.onSelect);
+            props?.onActive && eventEmitter.off('active', props.onActive);
+            props?.onInactive && eventEmitter.off('inactive', props.onInactive);
+            props?.onLeave && eventEmitter.off('leave', props.onLeave);
+            props?.onEnter && eventEmitter.off('enter', props.onEnter);
+            props?.onLeaveCancelled &&
+                eventEmitter.off('leaveCancelled', props.onLeaveCancelled);
+            props?.onEnterCancelled &&
+                eventEmitter.off('enterCancelled', props.onEnterCancelled);
+        };
+    });
 
     const unregisterSelf = () => {
         _navigation.unregisterNode(id);
