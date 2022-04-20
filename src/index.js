@@ -193,6 +193,10 @@ const insertTree = (tree, options) => _navigation.insertTree(tree, options);
 
 const getNode = (id) => _navigation.getNode(id);
 
+const addEventListener = (type, listener) => _navigation.on(type, listener);
+
+const removeEventListener = (type, listener) => _navigation.off(type, listener);
+
 export {
     initNavigation,
     destroyNavigation,
@@ -203,4 +207,6 @@ export {
     getRootNode,
     insertTree,
     getNode,
+    addEventListener,
+    removeEventListener,
 };
