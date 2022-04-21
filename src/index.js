@@ -38,6 +38,16 @@ const initNavigation = function (options) {
     }
 };
 
+const pauseNavigation = function () {
+    document.removeEventListener('keydown', _handleKeyEvent);
+    _log('navigation paused');
+};
+
+const resumeNavigation = function () {
+    document.addEventListener('keydown', _handleKeyEvent);
+    _log('navigation resumed');
+};
+
 const destroyNavigation = function () {
     document.removeEventListener('keydown', _handleKeyEvent);
     _navigation = undefined;
@@ -199,6 +209,8 @@ const removeEventListener = (type, listener) => _navigation.off(type, listener);
 
 export {
     initNavigation,
+    pauseNavigation,
+    resumeNavigation,
     destroyNavigation,
     useNavigation,
     NavigationContext,
