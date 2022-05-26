@@ -185,6 +185,8 @@ const useNavigation = function (props) {
     };
 };
 
+const getCurrentFocusNode = () => _navigation.getCurrentFocusNode();
+
 const assignFocus = function (id) {
     if (_navigation.getNode(id)) {
         _log('assigned focus:', id);
@@ -195,7 +197,18 @@ const assignFocus = function (id) {
     }
 };
 
-const getCurrentFocusNode = () => _navigation.getCurrentFocusNode();
+// Unlike assignFocus, this function will not ignore shouldCancelLeave and
+// shouldCancelEnter.
+const assignFocusSoft = function (id) {
+    if (
+        getCurrentFocusNode()?.shouldCancelLeave?.() ||
+        _navigation.getNode(id)?.shouldCancelEnter?.()
+    )
+        return false;
+
+    assignFocus(id);
+    return true;
+};
 
 const getRootNode = () => _navigation.getRootNode();
 
@@ -214,8 +227,9 @@ export {
     destroyNavigation,
     useNavigation,
     NavigationContext,
-    assignFocus,
     getCurrentFocusNode,
+    assignFocus,
+    assignFocusSoft,
     getRootNode,
     insertTree,
     getNode,
