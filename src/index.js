@@ -91,6 +91,10 @@ const useNavigation = function (props) {
                 eventEmitter.emit('blur', event, ref.current);
                 setFocused(false);
             },
+            onFocusWithin: (node, focusNode) =>
+                eventEmitter.emit('focusWithin', node, focusNode, ref.current),
+            onBlurWithin: (node, blurNode) =>
+                eventEmitter.emit('blurWithin', node, blurNode, ref.current),
             onSelect: (event) => {
                 eventEmitter.emit('select', event, ref.current);
             },
@@ -125,6 +129,10 @@ const useNavigation = function (props) {
     useEffect(() => {
         props?.onFocus && eventEmitter.on('focus', props.onFocus);
         props?.onBlur && eventEmitter.on('blur', props.onBlur);
+        props?.onFocusWithin &&
+            eventEmitter.on('focusWithin', props.onFocusWithin);
+        props?.onBlurWithin &&
+            eventEmitter.on('blurWithin', props.onBlurWithin);
         props?.onSelect && eventEmitter.on('select', props.onSelect);
         props?.onActive && eventEmitter.on('active', props.onActive);
         props?.onInactive && eventEmitter.on('inactive', props.onInactive);
@@ -138,6 +146,10 @@ const useNavigation = function (props) {
         return () => {
             props?.onFocus && eventEmitter.off('focus', props.onFocus);
             props?.onBlur && eventEmitter.off('blur', props.onBlur);
+            props?.onFocusWithin &&
+                eventEmitter.off('focusWithin', props.onFocusWithin);
+            props?.onBlurWithin &&
+                eventEmitter.off('blurWithin', props.onBlurWithin);
             props?.onSelect && eventEmitter.off('select', props.onSelect);
             props?.onActive && eventEmitter.off('active', props.onActive);
             props?.onInactive && eventEmitter.off('inactive', props.onInactive);

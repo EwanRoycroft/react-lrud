@@ -78,7 +78,7 @@ const Nav = function (props) {
     const { ref, active } = useNavigation({
         orientation: 'horizontal',
         id: props.id,
-        onActive: props.onActive,
+        onFocusWithin: props.onFocusWithin,
     });
 
     const itemStyle = { flexGrow: '4', height: '50px', lineHeight: '50px' };
@@ -114,7 +114,7 @@ const Nav = function (props) {
 
 Nav.propTypes = {
     id: PropTypes.string.isRequired,
-    onActive: PropTypes.func,
+    onFocusWithin: PropTypes.func,
 };
 
 const Row = function (props) {
@@ -122,7 +122,7 @@ const Row = function (props) {
         orientation: 'horizontal',
         id: props.id,
         isFocusable: false,
-        onActive: props.onActive,
+        onFocusWithin: props.onFocusWithin,
     });
 
     const columnSpan = props.columnTemplate ?? new Array(props.columns).fill(1);
@@ -180,7 +180,7 @@ const Row = function (props) {
 
 Row.propTypes = {
     id: PropTypes.string.isRequired,
-    onActive: PropTypes.func,
+    onFocusWithin: PropTypes.func,
     columns: PropTypes.number.isRequired,
     columnTemplate: PropTypes.array,
 };
@@ -209,18 +209,18 @@ const Grid = function (props) {
                 <Row
                     id={`${props.id}_row0`}
                     columns={7}
-                    onActive={props.onActive}
+                    onFocusWithin={props.onFocusWithin}
                 />
                 <Row
                     id={`${props.id}_row1`}
                     columns={5}
                     columnTemplate={[1, 2, 1, 2, 1]}
-                    onActive={props.onActive}
+                    onFocusWithin={props.onFocusWithin}
                 />
                 <Row
                     id={`${props.id}_row2`}
                     columns={5}
-                    onActive={props.onActive}
+                    onFocusWithin={props.onFocusWithin}
                 />
             </div>
         </NavigationContext.Provider>
@@ -229,7 +229,7 @@ const Grid = function (props) {
 
 Grid.propTypes = {
     id: PropTypes.string.isRequired,
-    onActive: PropTypes.func,
+    onFocusWithin: PropTypes.func,
 };
 
 const Rail = function (props) {
@@ -237,7 +237,7 @@ const Rail = function (props) {
         orientation: 'horizontal',
         id: props.id,
         isWrapping: true,
-        onActive: props.onActive,
+        onFocusWithin: props.onFocusWithin,
     });
 
     const itemHeight = 100;
@@ -289,7 +289,7 @@ const Rail = function (props) {
 
 Rail.propTypes = {
     id: PropTypes.string.isRequired,
-    onActive: PropTypes.func,
+    onFocusWithin: PropTypes.func,
 };
 
 const App = function () {
@@ -303,7 +303,7 @@ const App = function () {
 
     useEffect(() => assignFocus('nav_page0'));
 
-    const handleActivation = (event, element) =>
+    const handleFocusWithin = (node, focusNode, element) =>
         ref.current.scrollTo({
             top: element.offsetTop - padding,
             behavior,
@@ -323,13 +323,13 @@ const App = function () {
                     textAlign: 'center',
                 }}
             >
-                <Nav id="nav" onActive={handleActivation} />
-                <Grid id="grid" onActive={handleActivation} />
+                <Nav id="nav" onFocusWithin={handleFocusWithin} />
+                <Grid id="grid" onFocusWithin={handleFocusWithin} />
                 {new Array(3).fill(undefined).map((value, key) => (
                     <Rail
                         key={key}
                         id={`rail${key}`}
-                        onActive={handleActivation}
+                        onFocusWithin={handleFocusWithin}
                     />
                 ))}
             </ScrollView>
