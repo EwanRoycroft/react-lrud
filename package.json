@@ -51,7 +51,7 @@
         "webpack-dev-server": "^3.11.1"
     },
     "dependencies": {
-        "lrud": "^8.0.0",
+        "lrud": "github:EwanRoycroft/lrud#px-mezz-2",
         "react": "^17.0.2",
         "react-dom": "^17.0.2",
         "uuid": "^8.3.2"
