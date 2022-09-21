@@ -60,6 +60,7 @@ let _focusIntentId;
 const useNavigation = function (props) {
     const [id] = useState(props?.id ?? uuidv4());
     const [focused, setFocused] = useState(false);
+    const [hasFocusWithin, setHasFocusWithin] = useState(false);
     const [active, setActive] = useState(false);
     const [disabled, setDisabled] = useState(false);
 
@@ -91,10 +92,14 @@ const useNavigation = function (props) {
                 eventEmitter.emit('blur', event, ref.current);
                 setFocused(false);
             },
-            onFocusWithin: (node, focusNode) =>
-                eventEmitter.emit('focusWithin', node, focusNode, ref.current),
-            onBlurWithin: (node, blurNode) =>
-                eventEmitter.emit('blurWithin', node, blurNode, ref.current),
+            onFocusWithin: (node, focusNode) => {
+                eventEmitter.emit('focusWithin', node, focusNode, ref.current);
+                setHasFocusWithin(true);
+            },
+            onBlurWithin: (node, blurNode) => {
+                eventEmitter.emit('blurWithin', node, blurNode, ref.current);
+                setHasFocusWithin(false);
+            },
             onSelect: (event) => {
                 eventEmitter.emit('select', event, ref.current);
             },
@@ -181,6 +186,7 @@ const useNavigation = function (props) {
         actualId: id,
         ref,
         focused,
+        hasFocusWithin,
         active,
         getNode: () => _navigation.getNode(id),
         registerSelf: (options) => _navigation.registerNode(id, options),
