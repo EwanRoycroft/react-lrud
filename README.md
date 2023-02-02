@@ -1,5 +1,7 @@
 # React LRUD
 
+**_DEPRECATED: See bbc/px-react-lrud_**
+
 Official React bindings for [Lrud](https://github.com/bbc/lrud)
 
 ## Install
